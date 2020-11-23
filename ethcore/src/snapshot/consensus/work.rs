@@ -342,7 +342,7 @@ impl Rebuilder for PowRebuilder {
                 );
             }
             //self.db.write_buffered(batch);
-            self.chain.commit( || {self.db.write_buffered(batch)});
+            self.chain.commit(|| self.db.write_buffered(batch));
 
             parent_hash = block.header.hash();
             cur_number += 1;

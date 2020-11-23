@@ -458,7 +458,7 @@ impl BlockProvider for BlockChain {
 					.flat_map(|input| {
                         let number = input.0;
                         let hash = input.1;
-                        let mut receipts : Vec<TypedReceipt> = input.2;
+                        let mut receipts : Vec<Receipt> = input.2;
                         let mut hashes = input.3;
 						if receipts.len() != hashes.len() {
 							warn!("Block {} ({}) has different number of receipts ({}) to transactions ({}). Database corrupt?", number, hash, receipts.len(), hashes.len());
@@ -1481,7 +1481,7 @@ impl BlockChain {
     }
 
     /// Apply pending insertion updates
-    pub fn commit<F>(&self, execute_atomicly: F)
+    pub fn commit<F>(&self, execute_atomically: F)
     where
         F: FnOnce(),
     {
@@ -1505,7 +1505,7 @@ impl BlockChain {
             *best_block = block;
         }
 
-        execute_atomicly();
+        execute_atomically();
 
         let pending_txs = mem::replace(&mut *pending_write_txs, HashMap::new());
         let (retracted_txs, enacted_txs) = pending_txs
