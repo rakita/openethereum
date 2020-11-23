@@ -455,7 +455,11 @@ impl BlockProvider for BlockChain {
 					.filter_map(|hash| self.block_number(&hash).map(|r| (r, hash)))
 					.filter_map(|(number, hash)| self.block_receipts(&hash).map(|r| (number, hash, r.receipts)))
 					.filter_map(|(number, hash, receipts)| self.block_body(&hash).map(|ref b| (number, hash, receipts, b.transaction_hashes())))
-					.flat_map(|(number, hash, mut receipts, mut hashes)| {
+					.flat_map(|input| {
+                        let number = input.0;
+                        let hash = input.1;
+                        let mut receipts : Vec<TypedReceipt> = input.2;
+                        let mut hashes = input.3;
 						if receipts.len() != hashes.len() {
 							warn!("Block {} ({}) has different number of receipts ({}) to transactions ({}). Database corrupt?", number, hash, receipts.len(), hashes.len());
 							assert!(false);
@@ -1477,7 +1481,10 @@ impl BlockChain {
     }
 
     /// Apply pending insertion updates
-    pub fn commit(&self) {
+    pub fn commit<F>(&self, execute_atomicly: F)
+    where
+        F: FnOnce(),
+    {
         let mut pending_best_ancient_block = self.pending_best_ancient_block.write();
         let mut pending_best_block = self.pending_best_block.write();
         let mut pending_write_hashes = self.pending_block_hashes.write();
@@ -1497,6 +1504,8 @@ impl BlockChain {
         if let Some(block) = pending_best_block.take() {
             *best_block = block;
         }
+
+        execute_atomicly();
 
         let pending_txs = mem::replace(&mut *pending_write_txs, HashMap::new());
         let (retracted_txs, enacted_txs) = pending_txs
@@ -1991,7 +2000,7 @@ mod tests {
         let res = insert_block_batch(&mut batch, bc, block, receipts);
         db.key_value().write(batch).unwrap();
         if commit {
-            bc.commit();
+            bc.commit(|| {});
         }
         res
     }
@@ -2040,7 +2049,7 @@ mod tests {
         // when
         insert_block_commit(&db, &bc, first.last().encoded(), vec![], false);
         assert_eq!(bc.best_block_number(), 0);
-        bc.commit();
+        bc.commit(|| {});
         // NOTE no db.write here (we want to check if best block is cached)
 
         // then
@@ -2073,7 +2082,7 @@ mod tests {
         let mut batch = db.key_value().transaction();
         insert_block_batch(&mut batch, &bc, first.encoded(), vec![]);
         db.key_value().write(batch).unwrap();
-        bc.commit();
+        bc.commit(|| {});
 
         assert_eq!(bc.block_hash(0), Some(genesis_hash));
         assert_eq!(bc.best_block_number(), 1);
@@ -2101,7 +2110,7 @@ mod tests {
         for block in generator {
             block_hashes.push(block.hash());
             insert_block_batch(&mut batch, &bc, block.encoded(), vec![]);
-            bc.commit();
+            bc.commit(|| {});
         }
         db.key_value().write(batch).unwrap();
 
@@ -2184,9 +2193,9 @@ mod tests {
 
         let mut batch = db.key_value().transaction();
         let _ = insert_block_batch(&mut batch, &bc, b1a.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         let _ = insert_block_batch(&mut batch, &bc, b1b.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         db.key_value().write(batch).unwrap();
 
         assert_eq!(bc.best_block_hash(), b1a_hash);
@@ -2201,7 +2210,7 @@ mod tests {
         // now let's make forked chain the canon chain
         let mut batch = db.key_value().transaction();
         let _ = insert_block_batch(&mut batch, &bc, b2.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         db.key_value().write(batch).unwrap();
 
         // Transaction should be retracted
@@ -2271,9 +2280,9 @@ mod tests {
 
         let mut batch = db.key_value().transaction();
         let _ = insert_block_batch(&mut batch, &bc, b1a.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         let _ = insert_block_batch(&mut batch, &bc, b1b.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         db.key_value().write(batch).unwrap();
 
         assert_eq!(bc.best_block_hash(), b1a_hash);
@@ -2295,7 +2304,7 @@ mod tests {
         // now let's make forked chain the canon chain
         let mut batch = db.key_value().transaction();
         let _ = insert_block_batch(&mut batch, &bc, b2.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         db.key_value().write(batch).unwrap();
 
         assert_eq!(bc.best_block_hash(), b2_hash);
@@ -2344,16 +2353,16 @@ mod tests {
 
         let mut batch = db.key_value().transaction();
         let ir1 = insert_block_batch(&mut batch, &bc, b1.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         let ir2 = insert_block_batch(&mut batch, &bc, b2.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         let ir3b = insert_block_batch(&mut batch, &bc, b3b.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         db.key_value().write(batch).unwrap();
         assert_eq!(bc.block_hash(3).unwrap(), b3b_hash);
         let mut batch = db.key_value().transaction();
         let ir3a = insert_block_batch(&mut batch, &bc, b3a.last().encoded(), vec![]);
-        bc.commit();
+        bc.commit(|| {});
         db.key_value().write(batch).unwrap();
 
         assert_eq!(
@@ -2471,7 +2480,7 @@ mod tests {
             let mut batch = db.key_value().transaction();
             insert_block_batch(&mut batch, &bc, first.last().encoded(), vec![]);
             db.key_value().write(batch).unwrap();
-            bc.commit();
+            bc.commit(|| {});
             assert_eq!(bc.best_block_hash(), first_hash);
         }
 
@@ -2494,7 +2503,7 @@ mod tests {
         let mut batch = db.key_value().transaction();
         insert_block_batch(&mut batch, &bc, encoded::Block::new(b1), vec![]);
         db.key_value().write(batch).unwrap();
-        bc.commit();
+        bc.commit(|| {});
 
         let transactions = bc.transactions(&b1_hash).unwrap();
         assert_eq!(transactions.len(), 7);
@@ -2830,11 +2839,11 @@ mod tests {
             false,
             false,
         );
-        bc.commit();
+        bc.commit(|| {});
         bc.insert_unordered_block(&mut batch, b3.last().encoded(), vec![], None, true, false);
-        bc.commit();
+        bc.commit(|| {});
         bc.insert_unordered_block(&mut batch, b1.last().encoded(), vec![], None, false, false);
-        bc.commit();
+        bc.commit(|| {});
         db.key_value().write(batch).unwrap();
 
         assert_eq!(bc.best_block_hash(), b3.last().hash());
@@ -2866,13 +2875,13 @@ mod tests {
             // create a longer fork
             for block in generator {
                 insert_block_batch(&mut batch, &bc, block.encoded(), vec![]);
-                bc.commit();
+                bc.commit(|| {});
             }
 
             assert_eq!(bc.best_block_number(), 5);
             insert_block_batch(&mut batch, &bc, uncle.last().encoded(), vec![]);
             db.key_value().write(batch).unwrap();
-            bc.commit();
+            bc.commit(|| {});
         }
 
         // re-loading the blockchain should load the correct best block.
@@ -2906,7 +2915,7 @@ mod tests {
                         proof: vec![],
                     },
                 );
-                bc.commit();
+                bc.commit(|| {});
             }
 
             assert_eq!(bc.best_block_number(), 5);
@@ -2923,7 +2932,7 @@ mod tests {
             );
 
             db.key_value().write(batch).unwrap();
-            bc.commit();
+            bc.commit(|| {});
 
             // epoch 999 not in canonical chain.
             assert_eq!(
@@ -3046,7 +3055,7 @@ mod tests {
             let mut batch = db.key_value().transaction();
             for block in blocks {
                 insert_block_batch(&mut batch, &bc, block.last().encoded(), vec![]);
-                bc.commit();
+                bc.commit(|| {});
             }
             db.key_value().write(batch).unwrap();
             (db, bc)
@@ -3055,7 +3064,7 @@ mod tests {
         let mark_finalized = |block_hash: H256, db: &Arc<dyn BlockChainDB>, bc: &BlockChain| {
             let mut batch = db.key_value().transaction();
             bc.mark_finalized(&mut batch, block_hash).unwrap();
-            bc.commit();
+            bc.commit(|| {});
             db.key_value().write(batch).unwrap();
         };
 

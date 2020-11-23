@@ -462,8 +462,7 @@ impl Service {
 
             // Writing changes to DB and logging every now and then
             if block_number % 1_000 == 0 {
-                next_db.key_value().write_buffered(batch);
-                next_chain.commit();
+                next_chain.commit( || {next_db.key_value().write_buffered(batch);});
                 next_db.key_value().flush().expect("DB flush failed.");
                 batch = DBTransaction::new();
             }
@@ -474,8 +473,8 @@ impl Service {
         }
 
         // Final commit to the DB
-        next_db.key_value().write_buffered(batch);
-        next_chain.commit();
+        
+        next_chain.commit(|| {next_db.key_value().write_buffered(batch);});
         next_db.key_value().flush().expect("DB flush failed.");
 
         // We couldn't reach the targeted hash

@@ -535,8 +535,8 @@ impl Importer {
                 true,
             );
             // Final commit to the DB
-            db.write_buffered(batch);
-            chain.commit();
+            //db.write_buffered(batch);
+            chain.commit(|| { db.write_buffered(batch)});
         }
         db.flush().expect("DB flush failed.");
         Ok(())
@@ -669,8 +669,8 @@ impl Importer {
         let is_canon = route.enacted.last().map_or(false, |h| h == hash);
         state.sync_cache(&route.enacted, &route.retracted, is_canon);
         // Final commit to the DB
-        client.db.read().key_value().write_buffered(batch);
-        chain.commit();
+        //client.db.read().key_value().write_buffered(batch);
+        chain.commit( || { client.db.read().key_value().write_buffered(batch); });
 
         self.check_epoch_end(&header, &finalized, &chain, client);
 
