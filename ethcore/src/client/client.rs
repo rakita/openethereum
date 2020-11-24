@@ -1173,7 +1173,10 @@ impl Client {
 
     /// Get a copy of the best block's state.
     pub fn latest_state_and_header(&self) -> (State<StateDB>, Header) {
-        let header = self.best_block_header();
+        // in commit we are locking best_block.write and state_db.read in this order.
+        // bcs of that it is fine that we are reading best_block.read() and thn state_db.read()
+        let best_block = self.chain.read().best_block_locked().read();
+        let header = &best_block.header;
         let state = State::from_existing(
             self.state_db.read().boxed_clone_canon(&header.hash()),
             *header.state_root(),

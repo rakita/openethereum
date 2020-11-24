@@ -1480,7 +1480,7 @@ impl BlockChain {
         }
     }
 
-    /// Apply pending insertion updates
+    /// Apply pending insertion updates.
     pub fn commit<F>(&self, execute_atomically: F)
     where
         F: FnOnce(),
@@ -1822,6 +1822,11 @@ impl BlockChain {
     /// Get best block header
     pub fn best_block_header(&self) -> Header {
         self.best_block.read().header.clone()
+    }
+
+    /// get best block that is still not locked
+    pub fn best_block_locked(&self) -> &RwLock<BestBlock> {
+        &self.best_block
     }
 
     /// Get current cache size.
