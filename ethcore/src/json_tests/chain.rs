@@ -102,8 +102,8 @@ fn check_poststate(
                     let current_value: &[u8] = current_value.as_ref();
                     let expected_value: &[u8] = expected_value.as_ref();
                     warn!(target: "json-tests", "{} – Poststate {:?} state {} mismatch actual={} expected={}",
-						test_name, address, position.to_hex(), current_value.to_hex(),
-						expected_value.to_hex());
+						test_name, address, position.to_hex::<String>(), current_value.to_hex::<String>(),
+						expected_value.to_hex::<String>());
                     success = false;
                 }
             }

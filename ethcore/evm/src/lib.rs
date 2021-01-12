@@ -26,6 +26,7 @@ extern crate num_bigint;
 extern crate parity_bytes as bytes;
 extern crate parking_lot;
 extern crate vm;
+extern crate hex_literal;
 
 #[macro_use]
 extern crate lazy_static;
@@ -33,8 +34,7 @@ extern crate lazy_static;
 #[cfg_attr(feature = "evm-debug", macro_use)]
 extern crate log;
 
-#[cfg(test)]
-extern crate hex_literal;
+
 #[cfg(test)]
 extern crate rustc_hex;
 

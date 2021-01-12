@@ -157,10 +157,10 @@ impl Into<helpers::TransactionRequest> for TransactionRequest {
 mod tests {
     use super::*;
     use ethereum_types::{H160, U256};
-    use rustc_hex::FromHex;
     use serde_json;
     use std::str::FromStr;
     use v1::types::TransactionCondition;
+    use hex_literal::hex;
 
     #[test]
     fn transaction_request_deserialize() {
@@ -212,7 +212,7 @@ mod tests {
 			gas_price: Some(U256::from_str("9184e72a000").unwrap()),
 			gas: Some(U256::from_str("76c0").unwrap()),
 			value: Some(U256::from_str("9184e72a").unwrap()),
-			data: Some("d46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675".from_hex().unwrap().into()),
+			data: Some(hex!("d46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675").to_vec().into()),
 			nonce: None,
             condition: None,
             access_list: None,

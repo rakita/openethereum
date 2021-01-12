@@ -401,7 +401,7 @@ mod test {
     use std::collections::VecDeque;
 
     fn h256(hex: &str) -> H256 {
-        let bytes = FromHex::from_hex(hex).unwrap();
+        let bytes: Vec<u8> = FromHex::from_hex(hex).unwrap();
         let mut res = [0; 32];
         res.copy_from_slice(&bytes);
         res
@@ -514,10 +514,10 @@ mod test {
 
         let (digest, result) = progpow(header_hash, 0, 0, cache.as_ref(), &c_dag);
 
-        let expected_digest =
+        let expected_digest: Vec<u8> =
             FromHex::from_hex("63155f732f2bf556967f906155b510c917e48e99685ead76ea83f4eca03ab12b")
                 .unwrap();
-        let expected_result =
+        let expected_result: Vec<u8> =
             FromHex::from_hex("faeb1be51075b03a4ff44b335067951ead07a3b078539ace76fd56fc410557a3")
                 .unwrap();
 

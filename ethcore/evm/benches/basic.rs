@@ -28,6 +28,7 @@ extern crate parity_bytes as bytes;
 extern crate parking_lot;
 extern crate rustc_hex;
 extern crate vm;
+extern crate hex_literal;
 
 use criterion::{black_box, Bencher, Criterion};
 use ethereum_types::{Address, U256};
@@ -35,6 +36,7 @@ use evm::Factory;
 use rustc_hex::FromHex;
 use std::{collections::BTreeMap, str::FromStr, sync::Arc};
 use vm::{tests::FakeExt, ActionParams, Ext, GasLeft, Result};
+use hex_literal::hex;
 
 criterion_group!(
     basic,
@@ -66,7 +68,7 @@ fn simple_loop_log0(gas: U256, b: &mut Bencher) {
     let mut ext = FakeExt::new();
 
     let address = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
-    let code = black_box("62ffffff5b600190036000600fa0600357".from_hex().unwrap());
+    let code: Vec<u8> = black_box("62ffffff5b600190036000600fa0600357".from_hex().unwrap());
 
     b.iter(|| {
         let mut params = ActionParams::default();
@@ -99,7 +101,7 @@ fn mem_gas_calculation_same(gas: U256, b: &mut Bencher) {
     let address = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
 
     b.iter(|| {
-        let code = black_box(
+        let code: Vec<u8> = black_box(
             "6110006001556001546000555b610fff805560016000540380600055600c57"
                 .from_hex()
                 .unwrap(),
@@ -135,7 +137,7 @@ fn mem_gas_calculation_increasing(gas: U256, b: &mut Bencher) {
     let address = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
 
     b.iter(|| {
-        let code = black_box(
+        let code: Vec<u8> = black_box(
             "6110006001556001546000555b610fff60005401805560016000540380600055600c57"
                 .from_hex()
                 .unwrap(),
@@ -160,7 +162,7 @@ fn blockhash_mulmod_small(b: &mut Criterion) {
 		let address = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
 
 		b.iter(|| {
-			let code = black_box(
+			let code: Vec<u8> = black_box(
 				"6080604052348015600f57600080fd5b5060005a90505b60c881111560de5760017effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80095060017effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80095060017effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80095060017effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80095060017effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8009505a90506016565b506035806100ed6000396000f3fe6080604052600080fdfea165627a7a72305820bde4a0ac6d0fac28fc879244baf8a6a0eda514bc95fb7ecbcaaebf2556e2687c0029".from_hex().unwrap()
 			);
 
@@ -184,7 +186,7 @@ fn blockhash_mulmod_large(b: &mut Criterion) {
 		let address = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
 
 		b.iter(|| {
-			let code = black_box(
+			let code: Vec<u8> = black_box(
 				"608060405234801561001057600080fd5b5060005a90505b60c8811115610177577efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff17efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff08009507efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff17efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff08009507efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff17efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff08009507efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff17efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff08009507efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff17efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff08009505a9050610017565b506035806101866000396000f3fe6080604052600080fdfea165627a7a72305820dcaec306f67bb96f3044fff25c9af2ec66f01d0954d0656964f046f42f2780670029".from_hex().unwrap()
 			);
 

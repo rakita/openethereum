@@ -36,9 +36,9 @@ pub struct KeyPair {
 
 impl fmt::Display for KeyPair {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        writeln!(f, "secret:  {}", self.secret.to_hex())?;
-        writeln!(f, "public:  {}", self.public.to_hex())?;
-        write!(f, "address: {}", self.address().to_hex())
+        writeln!(f, "secret:  {}", self.secret.to_hex::<String>())?;
+        writeln!(f, "public:  {}", self.public.to_hex::<String>())?;
+        write!(f, "address: {}", self.address().to_hex::<String>())
     }
 }
 

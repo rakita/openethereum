@@ -64,9 +64,9 @@ impl Into<Request> for CallRequest {
 mod tests {
     use super::CallRequest;
     use ethereum_types::{H160, U256};
-    use rustc_hex::FromHex;
     use serde_json;
     use std::str::FromStr;
+    use hex_literal::hex;
 
     #[test]
     fn call_request_deserialize() {
@@ -116,7 +116,7 @@ mod tests {
 			gas_price: Some(U256::from_str("9184e72a000").unwrap()),
 			gas: Some(U256::from_str("76c0").unwrap()),
 			value: Some(U256::from_str("9184e72a").unwrap()),
-			data: Some("d46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675".from_hex().unwrap().into()),
+			data: Some(hex!("d46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675").to_vec().into()),
             nonce: None,
             access_list: None,
 		});

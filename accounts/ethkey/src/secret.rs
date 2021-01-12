@@ -16,7 +16,7 @@
 
 use ethereum_types::H256;
 use memzero::Memzero;
-use rustc_hex::ToHex;
+//use rustc_hex::ToHex;
 use secp256k1::{constants::SECRET_KEY_SIZE as SECP256K1_SECRET_KEY_SIZE, key};
 use std::{fmt, ops::Deref, str::FromStr};
 use Error;
@@ -25,12 +25,6 @@ use SECP256K1;
 #[derive(Clone, PartialEq, Eq)]
 pub struct Secret {
     inner: Memzero<H256>,
-}
-
-impl ToHex for Secret {
-    fn to_hex(&self) -> String {
-        format!("{:x}", *self.inner)
-    }
 }
 
 impl fmt::LowerHex for Secret {

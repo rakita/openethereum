@@ -101,11 +101,11 @@ impl<'a> TransactionView<'a> {
 #[cfg(test)]
 mod tests {
     use super::TransactionView;
-    use rustc_hex::FromHex;
+    use hex_literal::hex;
 
     #[test]
     fn test_transaction_view() {
-        let rlp = "f87c80018261a894095e7baea6a6c7c4c2dfeb977efac326af552d870a9d00000000000000000000000000000000000000000000000000000000001ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804".from_hex().unwrap();
+        let rlp = hex!("f87c80018261a894095e7baea6a6c7c4c2dfeb977efac326af552d870a9d00000000000000000000000000000000000000000000000000000000001ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804");
 
         let view = view!(TransactionView, &rlp);
         assert_eq!(view.nonce(), 0.into());
@@ -114,9 +114,7 @@ mod tests {
         assert_eq!(view.value(), 0xa.into());
         assert_eq!(
             view.data(),
-            "0000000000000000000000000000000000000000000000000000000000"
-                .from_hex()
-                .unwrap()
+            hex!("0000000000000000000000000000000000000000000000000000000000")
         );
         assert_eq!(
             view.r(),

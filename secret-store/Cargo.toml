@@ -27,7 +27,7 @@ parity-bytes = "0.1"
 parity-crypto = "0.3"
 parity-runtime = { path = "../util/runtime" }
 parking_lot = "0.7"
-rustc-hex = "1.0"
+rustc-hex = "2.1"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"

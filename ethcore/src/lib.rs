@@ -105,6 +105,10 @@ extern crate trace_time;
 #[macro_use]
 extern crate serde_derive;
 
+
+#[cfg(test)]
+extern crate hex_literal;
+
 #[cfg_attr(test, macro_use)]
 extern crate evm;
 

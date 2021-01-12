@@ -54,7 +54,7 @@ macro_rules! impl_hash {
             where
                 S: Serializer,
             {
-                serializer.serialize_str(&self.0.to_hex())
+                serializer.serialize_str(&self.0.to_hex::<String>())
             }
         }
 
@@ -95,7 +95,7 @@ macro_rules! impl_hash {
             type Err = Error;
 
             fn from_str(value: &str) -> Result<Self, Self::Err> {
-                match value.from_hex() {
+                match value.from_hex::<Vec<u8>>() {
                     Ok(ref hex) if hex.len() == $size => {
                         let mut hash = [0u8; $size];
                         hash.clone_from_slice(hex);

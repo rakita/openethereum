@@ -15,7 +15,6 @@
 // along with OpenEthereum.  If not, see <http://www.gnu.org/licenses/>.
 
 use ethereum_types::{Address, U256};
-use rustc_hex::FromHex;
 use std::{str::FromStr, sync::Arc};
 
 use ethcore::{client::TestBlockChainClient, miner::MinerService};
@@ -26,6 +25,7 @@ use jsonrpc_core::IoHandler;
 use v1::{tests::helpers::TestMinerService, ParitySet, ParitySetClient};
 
 use fake_fetch::FakeFetch;
+use hex_literal::hex;
 
 fn miner_service() -> Arc<TestMinerService> {
     Arc::new(TestMinerService::default())
@@ -121,9 +121,7 @@ fn rpc_parity_set_extra_data() {
     assert_eq!(io.handle_request_sync(request), Some(response.to_owned()));
     assert_eq!(
         miner.authoring_params().extra_data,
-        "cd1722f3947def4cf144679da39c4c32bdc35681"
-            .from_hex()
-            .unwrap()
+        hex!("cd1722f3947def4cf144679da39c4c32bdc35681").to_vec()
     );
 }
 

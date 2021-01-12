@@ -207,7 +207,7 @@ fn rpc_eth_sign_transaction() {
 
     let response = r#"{"jsonrpc":"2.0","result":{"#.to_owned()
         + r#""raw":"0x"#
-        + &rlp.to_hex()
+        + &rlp.to_hex::<String>()
         + r#"","#
         + r#""tx":{"#
         + r#""blockHash":null,"blockNumber":null,"#
@@ -223,7 +223,7 @@ fn rpc_eth_sign_transaction() {
         + r#""nonce":"0x1","#
         + &format!("\"publicKey\":\"0x{:x}\",", t.recover_public().unwrap())
         + &format!("\"r\":\"0x{:x}\",", U256::from(signature.r()))
-        + &format!("\"raw\":\"0x{}\",", rlp.to_hex())
+        + &format!("\"raw\":\"0x{}\",", rlp.to_hex::<String>())
         + &format!("\"s\":\"0x{:x}\",", U256::from(signature.s()))
         + &format!("\"standardV\":\"0x{:x}\",", U256::from(t.standard_v()))
         + r#""to":"0xd46e8dd67c5d32be8058bb8eb970870f07244567","transactionIndex":null,"#

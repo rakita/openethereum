@@ -47,7 +47,7 @@ impl Serialize for Bytes {
     where
         S: Serializer,
     {
-        serializer.serialize_str(&self.0.to_hex())
+        serializer.serialize_str(&self.0.to_hex::<String>())
     }
 }
 

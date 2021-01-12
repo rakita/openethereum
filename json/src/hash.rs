@@ -100,7 +100,7 @@ macro_rules! impl_hash {
                 S: Serializer,
             {
                 let mut hex = "0x".to_owned();
-                hex.push_str(&self.0.to_hex());
+                hex.push_str(&self.0.to_hex::<String>());
                 serializer.serialize_str(&hex)
             }
         }

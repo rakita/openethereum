@@ -48,7 +48,8 @@ extern crate unexpected;
 extern crate rlp_derive;
 
 #[cfg(test)]
-extern crate rustc_hex;
+extern crate hex_literal;
+
 
 #[macro_use]
 pub mod views;

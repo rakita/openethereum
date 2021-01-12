@@ -308,9 +308,7 @@ fn test_log_sender(factory: super::Factory) {
     );
     assert_eq!(
         ext.logs[0].data,
-        "ff00000000000000000000000000000000000000000000000000000000000000"
-            .from_hex()
-            .unwrap()
+        hex!("ff00000000000000000000000000000000000000000000000000000000000000")
     );
 }
 
@@ -1668,8 +1666,8 @@ fn push_two_pop_one_constantinople_test(
     push2: &str,
     result: &str,
 ) {
-    let mut push1 = push1.from_hex().unwrap();
-    let mut push2 = push2.from_hex().unwrap();
+    let mut push1: Vec<u8> = push1.from_hex().unwrap();
+    let mut push2: Vec<u8> = push2.from_hex().unwrap();
     assert!(push1.len() <= 32 && push1.len() != 0);
     assert!(push2.len() <= 32 && push2.len() != 0);
 

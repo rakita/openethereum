@@ -92,7 +92,6 @@ fn eth_signing() -> SigningTester {
 
 #[test]
 fn rpc_eth_sign() {
-    use rustc_hex::FromHex;
 
     let tester = eth_signing();
 
@@ -103,9 +102,6 @@ fn rpc_eth_sign() {
     tester
         .accounts
         .unlock_account_permanently(account, "abcd".into())
-        .unwrap();
-    let _message = "0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f"
-        .from_hex()
         .unwrap();
 
     let req = r#"{

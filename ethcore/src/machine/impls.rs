@@ -546,6 +546,7 @@ fn round_block_gas_limit(gas_limit: U256, lower_limit: U256, upper_limit: U256) 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use hex_literal::hex;
 
     fn get_default_ethash_extensions() -> EthashExtensions {
         EthashExtensions {
@@ -558,9 +559,9 @@ mod tests {
 
     #[test]
     fn should_disallow_unsigned_transactions() {
-        let rlp = "ea80843b9aca0083015f90948921ebb5f79e9e3920abe571004d0b1d5119c154865af3107a400080038080";
+        let rlp = hex!("ea80843b9aca0083015f90948921ebb5f79e9e3920abe571004d0b1d5119c154865af3107a400080038080");
         let transaction: UnverifiedTransaction =
-            TypedTransaction::decode(&::rustc_hex::FromHex::from_hex(rlp).unwrap()).unwrap();
+            TypedTransaction::decode(&rlp).unwrap();
         let spec = ::ethereum::new_ropsten_test();
         let ethparams = get_default_ethash_extensions();
 
