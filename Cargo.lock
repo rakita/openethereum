@@ -2920,7 +2920,7 @@ dependencies = [
  "tempdir",
  "term_size",
  "textwrap 0.9.0",
- "toml 0.4.10",
+ "toml",
  "winapi 0.3.8",
 ]
 
@@ -3224,7 +3224,7 @@ dependencies = [
  "rlp 0.3.0",
  "rustc_version 0.3.2",
  "target_info",
- "toml 0.4.10",
+ "toml",
  "vergen",
 ]
 
@@ -3540,7 +3540,7 @@ version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e10d4b51f154c8a7fb96fd6dad097cb74b863943ec010ac94b9fd1be8861fe1e"
 dependencies = [
- "toml 0.5.5",
+ "toml",
 ]
 
 [[package]]
@@ -4977,15 +4977,6 @@ dependencies = [
  "tokio-codec",
  "tokio-io",
  "tokio-reactor",
-]
-
-[[package]]
-name = "toml"
-version = "0.4.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "758664fc71a3a69038656bee8b6be6477d2a6c315a6b81f7081f591bffa4111f"
-dependencies = [
- "serde",
 ]
 
 [[package]]

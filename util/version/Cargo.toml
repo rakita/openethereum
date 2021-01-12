@@ -15,7 +15,7 @@ target_info = "0.1"
 [build-dependencies]
 vergen = "0.1"
 rustc_version = "0.3"
-toml = "0.4"
+toml = "0.5"
 
 [features]
 final = []
