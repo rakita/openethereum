@@ -122,8 +122,8 @@ impl Drop for Stratum {
         self.rpc_server.take().map(|server| server.close());
     }
 }
-
 struct StratumImpl {
+
     /// Subscribed clients
     subscribers: RwLock<Vec<SocketAddr>>,
     /// List of workers supposed to receive job update

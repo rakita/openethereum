@@ -14,7 +14,7 @@ hyper = { version = "0.12", optional = true }
 url = { version = "2", optional = true }
 
 # Miner
-ansi_term = "0.10"
+ansi_term = "0.12"
 common-types = { path = "../ethcore/types" }
 error-chain = "0.12"
 ethabi = "6.0"
