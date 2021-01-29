@@ -80,7 +80,7 @@ type FastMap<H, T> =
 /// ```
 #[derive(Clone, PartialEq)]
 pub struct MemoryDB<H: KeyHasher, T> {
-    data: FastMap<H, (T, i32)>,
+    pub data: FastMap<H, (T, i32)>,
     hashed_null_node: H::Out,
     null_node_data: T,
 }

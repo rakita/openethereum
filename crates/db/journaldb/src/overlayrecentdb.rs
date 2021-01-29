@@ -334,7 +334,7 @@ impl JournalDB for OverlayRecentDB {
 
     // t_nb 9.6
     fn journal_under(&mut self, batch: &mut DBTransaction, now: u64, id: &H256) -> io::Result<u32> {
-        trace!(target: "journaldb", "entry: #{} ({})", now, id);
+        info!(target: "journaldb", "entry: #{} ({})", now, id);
 
         let mut journal_overlay = self.journal_overlay.write();
 
@@ -342,6 +342,8 @@ impl JournalDB for OverlayRecentDB {
         journal_overlay.pending_overlay.clear();
 
         let mut tx = self.transaction_overlay.drain();
+        let capacity_tx = tx.capacity();
+        let len_tx = tx.len();
         let inserted_keys: Vec<_> = tx
             .iter()
             .filter_map(|(k, &(_, c))| if c > 0 { Some(k.clone()) } else { None })
@@ -357,6 +359,8 @@ impl JournalDB for OverlayRecentDB {
             .drain()
             .filter_map(|(k, (v, c))| if c > 0 { Some((k, v)) } else { None })
             .collect();
+        let capacity_insertions = insertions.capacity();
+        let len_insertions = insertions.len();
 
         let encoded_value = {
             let value_ref = DatabaseValueRef {
@@ -366,6 +370,13 @@ impl JournalDB for OverlayRecentDB {
             };
             encode(&value_ref)
         };
+        let mut capacity_backing = journal_overlay.backing_overlay.data.capacity();
+        let len_backing = journal_overlay.backing_overlay.data.len();
+
+        info!(
+            "Cumulative size: {}, (Len,Capacity)[tx:({},{}),insert:({},{}), backing_overlay:({},{})]",
+            journal_overlay.cumulative_size, len_tx,capacity_tx,len_insertions, capacity_insertions, len_backing,capacity_backing
+        );
 
         for (k, v) in insertions {
             let short_key = to_short_key(&k);
@@ -374,6 +385,11 @@ impl JournalDB for OverlayRecentDB {
             }
 
             journal_overlay.backing_overlay.emplace(short_key, v);
+            let cap = journal_overlay.backing_overlay.data.capacity();
+            if capacity_backing as f32 * 1.5 < cap as f32 {
+                info!("Backing capacity inc:{}", cap);
+                capacity_backing = cap;
+            }
         }
 
         let index = journal_overlay.journal.get(&now).map_or(0, |j| j.len());
